@@ -11,7 +11,7 @@ export GOFLAGS=-mod=vendor
 
 default: build
 
-build: fmtcheck
+build: fmtcheck modcheck
 	go install
 
 build-docker:
@@ -21,15 +21,15 @@ build-docker:
 test-docker:
 	docker run --rm -v $$(pwd):/go/src/github.com/terraform-providers/terraform-provider-azurerm -w /go/src/github.com/terraform-providers/terraform-provider-azurerm golang:1.11 make test
 
-test: fmtcheck
+test: fmtcheck modcheck
 	go test -i $(TEST) || exit 1
 	echo $(TEST) | \
 		xargs -t -n4 go test $(TESTARGS) -timeout=30s -parallel=4
 
-testacc: fmtcheck
+testacc: fmtcheck modcheck
 	TF_ACC=1 go test $(TEST) -v $(TESTARGS) -timeout 180m -ldflags="-X=github.com/terraform-providers/terraform-provider-azurerm/version.ProviderVersion=acc"
 
-debugacc: fmtcheck
+debugacc: fmtcheck modcheck
 	TF_ACC=1 dlv test $(TEST) --headless --listen=:2345 --api-version=2 -- -test.v $(TESTARGS)
 
 fmt:
@@ -48,6 +48,10 @@ goimport:
 lint:
 	@echo "==> Checking source code against linters..."
 	@GO111MODULE=off gometalinter ./...
+
+modcheck:
+	@echo "==> Verifying dependencies have expected content..."
+	go mod verify
 
 tools:
 	@echo "==> installing required tooling..."
