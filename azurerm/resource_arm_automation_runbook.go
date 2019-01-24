@@ -53,6 +53,7 @@ func resourceArmAutomationRunbook() *schema.Resource {
 					string(automation.PowerShell),
 					string(automation.PowerShellWorkflow),
 					string(automation.Script),
+					string(automation.Python),
 				}, true),
 			},
 
